@@ -12,10 +12,7 @@ function create_person(persons, model, n){
                     <div>
                         <b>Age:</b> ${persons[n]["age"]}<br>
                         <b>Gender:</b> ${gender}<br>
-                        <b>Complaint:</b> 
-                        <br>
-                        ${persons[n]["complaint"]}
-                        <br>
+                        <b>Complaint:</b> ${persons[n]["complaint"]}<br>
                         <b>Urgency:</b>
                         ${esi_text}
                     </div>
