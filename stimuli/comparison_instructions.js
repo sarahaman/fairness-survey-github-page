@@ -28,8 +28,8 @@ function create_example_patient(person_id, gender, age, complaint, esi){
         <div class="profile ${person_id} ${gender} ${urgency_status}" id=${person_id}">
             <div class="profile-col profile-text">
                 <div>
-                    <b>Age:</b> ${age} 
-                    <br>
+                    <b>Age:</b> ${age}<br>
+                    <b>Gender:</b> ${gender}<br>
                     <b>Complaint:</b> 
                     <br>
                     ${complaint}

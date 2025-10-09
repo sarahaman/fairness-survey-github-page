@@ -18,9 +18,13 @@ const ESI_URGENCY_THRESHOLD = 3;
 // A consistent fairness scale used when rating how fair a
 // particular model is
 const FAIRNESS_SCALE = {
-    "1" : "Not fair",
-    "2" : "Somewhat fair",
-    "3" : "Fair"
+    "1" : "Extremely unfair",
+    "2" : "",
+    "3" : "",
+    "4" : "Neither fair nor unfair",
+    "5" : "",
+    "6" : "",
+    "7" : "Extremely fair"
 }
 
 // Definitions of each fairness metric
@@ -413,11 +417,11 @@ const QUESTION_ONE = {
 }
 
 const QUESTION_TWO = {
-    question: `Suppose a different hospital has an ER waiting room containing:
+    question: `Suppose a different hospital has an ER waiting room containing:<br>
                <br>4 men that need to be seen today
                <br>6 men that do not need to be seen today
                <br>10 women that need to be seen today
-               <br>10 women that do not need to be seen today`,
+               <br>10 women that do not need to be seen today<br>`,
     subquestions : {
         'two_1' : {
             question: `Under the rule of demographic parity, if 2 men are seen today how many 
@@ -455,7 +459,7 @@ const DP_EO_OPTIONS = {'Demographic Parity': 'Demographic Parity',
                        'Equalized Odds': 'Equalized Odds'}
 
 const QUESTION_FOUR = {
-    question: `For the next three questions, you will be asked to answer whether a statement is TRUE or FALSE under each of the two rules:`,
+    question: `For the next three questions, you will be asked to answer whether a statement is TRUE or FALSE under each of the two rules:<br>`,
     text : {'four_1' :  `The number of men who are seen must be equal to the number of women who are seen.`,
             'four_2' :  `Even if a man and a woman are presenting with identical symptoms, they can be treated differently.`,
             'four_3' :  `The proportion of men who are seen must be equal to the proportion of women who are seen.`},
@@ -607,8 +611,8 @@ function create_example_patient(person_id, gender, age, complaint, esi){
         <div class="profile ${person_id} ${gender} ${urgency_status}" id=${person_id}">
             <div class="profile-col profile-text">
                 <div>
-                    <b>Age:</b> ${age} 
-                    <br>
+                    <b>Age:</b> ${age}<br>
+                    <b>Gender:</b> ${gender}<br>
                     <b>Complaint:</b> 
                     <br>
                     ${complaint}
@@ -733,14 +737,15 @@ function create_person(persons, model, n){
     let person_id = `person-${n}`;
     let esi = parseInt(persons[n]["esi"]);
     let esi_text = ESI_URGENCY_DICTIONARY[esi]
+    let gender = persons[n]["gender"];
     const urgency_status = "nonurgent";
 
     let person_html = `
-            <div class="profile ${persons[n]["decisions"][model]} ${persons[n]["gender"]} ${urgency_status}" id=${person_id}>
+            <div class="profile ${persons[n]["decisions"][model]} ${gender} ${urgency_status}" id=${person_id}>
                 <div class="profile-col profile-text">
                     <div>
-                        <b>Age:</b> ${persons[n]["age"]} 
-                        <br>
+                        <b>Age:</b> ${persons[n]["age"]}<br>
+                        <b>Gender:</b> ${gender}<br>
                         <b>Complaint:</b> 
                         <br>
                         ${persons[n]["complaint"]}

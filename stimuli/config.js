@@ -17,9 +17,13 @@ const ESI_URGENCY_THRESHOLD = 3;
 // A consistent fairness scale used when rating how fair a
 // particular model is
 const FAIRNESS_SCALE = {
-    "1" : "Not fair",
-    "2" : "Somewhat fair",
-    "3" : "Fair"
+    "1" : "Extremely unfair",
+    "2" : "",
+    "3" : "",
+    "4" : "Neither fair nor unfair",
+    "5" : "",
+    "6" : "",
+    "7" : "Extremely fair"
 }
 
 // Definitions of each fairness metric

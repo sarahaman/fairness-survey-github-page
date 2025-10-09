@@ -3,14 +3,15 @@ function create_person(persons, model, n){
     let person_id = `person-${n}`;
     let esi = parseInt(persons[n]["esi"]);
     let esi_text = ESI_URGENCY_DICTIONARY[esi]
+    let gender = persons[n]["gender"];
     const urgency_status = "nonurgent";
 
     let person_html = `
-            <div class="profile ${persons[n]["decisions"][model]} ${persons[n]["gender"]} ${urgency_status}" id=${person_id}>
+            <div class="profile ${persons[n]["decisions"][model]} ${gender} ${urgency_status}" id=${person_id}>
                 <div class="profile-col profile-text">
                     <div>
-                        <b>Age:</b> ${persons[n]["age"]} 
-                        <br>
+                        <b>Age:</b> ${persons[n]["age"]}<br>
+                        <b>Gender:</b> ${gender}<br>
                         <b>Complaint:</b> 
                         <br>
                         ${persons[n]["complaint"]}
