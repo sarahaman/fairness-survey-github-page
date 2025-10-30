@@ -31,7 +31,7 @@ function create_example_patient(person_id, gender, age, complaint, esi){
                     <b>Age:</b> ${age}<br>
                     <b>Gender:</b> ${gender}<br>
                     <b>Complaint:</b> ${complaint}<br>
-                    <b>Urgency:</b>${esi_text}
+                    <b>Urgency: </b>${esi_text}
                 </div>
             </div>
         </div>

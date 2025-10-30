@@ -304,7 +304,7 @@
     font-size: clamp(0.25rem, 0.75vw, 1rem);
     text-align: left;
     width: 80%;
-    line-height: 10px;
+    line-height: 20px;
 }
 
 .profile-decision {
