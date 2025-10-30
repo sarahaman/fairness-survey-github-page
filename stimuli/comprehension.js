@@ -31,8 +31,9 @@ const QUESTION_TWO = {
             options: {'A': '2', 'B': '4', 'C':'5'}
         },
         'two_3' : {
-            question: ` Under the rule of equalized odds, if 2 men who need to be seen today are 
-                        seen, how many women that need to be seen today would be seen?`,
+            question: ` Under the rule of equalized odds, if 5 women who do not need to be 
+                        seen today are seen, how many men that do not need to be seen today 
+                        should be seen?`,
             options: {'A': '3', 'B': '5', 'C':'6'}
         }
     }

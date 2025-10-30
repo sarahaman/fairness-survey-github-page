@@ -4,11 +4,11 @@ const NUM_PERSONS = 6;
 // Possible ESI scores and a translation of their relative 
 // urgency into plain text
 const ESI_URGENCY_DICTIONARY = {
-    "1": "Most urgent",
-    "2": "Mostly urgent",
-    "3": "Moderately urgent",
-    "4": "A little urgent",
-    "5": "Not urgent"
+    "1": "Highest urgency",
+    "2": "High urgency",
+    "3": "Medium urgency",
+    "4": "Low urgency",
+    "5": "Lowest urgency"
 }
 
 // ESI scores of 3 and greater are considered urgent
