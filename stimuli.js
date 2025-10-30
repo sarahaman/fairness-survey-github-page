@@ -5,11 +5,11 @@ const NUM_PERSONS = 6;
 // Possible ESI scores and a translation of their relative 
 // urgency into plain text
 const ESI_URGENCY_DICTIONARY = {
-    "1": "Most urgent",
-    "2": "Mostly urgent",
-    "3": "Moderately urgent",
-    "4": "A little urgent",
-    "5": "Not urgent"
+    "1": "Highest urgency",
+    "2": "High urgency",
+    "3": "Medium urgency",
+    "4": "Low urgency",
+    "5": "Lowest urgency"
 }
 
 // ESI scores of 3 and greater are considered urgent
@@ -434,8 +434,9 @@ const QUESTION_TWO = {
             options: {'A': '2', 'B': '4', 'C':'5'}
         },
         'two_3' : {
-            question: ` Under the rule of equalized odds, if 2 men who need to be seen today are 
-                        seen, how many women that need to be seen today would be seen?`,
+            question: ` Under the rule of equalized odds, if 5 women who do not need to be 
+                        seen today are seen, how many men that do not need to be seen today 
+                        should be seen?`,
             options: {'A': '3', 'B': '5', 'C':'6'}
         }
     }
