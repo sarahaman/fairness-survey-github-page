@@ -741,11 +741,11 @@ function create_person(persons, model, n){
             <div class="profile ${persons[n]["decisions"][model]} ${gender} ${urgency_status}" id=${person_id}>
                 <div class="profile-col profile-text">
                     <div>
-                        <p><b>Age:</b> ${persons[n]["age"]}</p>
-                        <p><b>Gender:</b> ${gender}</p>
-                        <p><b>Complaint:</b> ${persons[n]["complaint"]}</p>
-                        <p><b>Urgency:</b>
-                        ${esi_text}</p>
+                        <b>Age:</b> ${persons[n]["age"]}<br>
+                        <b>Gender:</b> ${gender}<br>
+                        <b>Complaint:</b> ${persons[n]["complaint"]}<br>
+                        <b>Urgency:</b>
+                        ${esi_text}
                     </div>
                 </div>
             </div>
