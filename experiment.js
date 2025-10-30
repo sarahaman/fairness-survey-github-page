@@ -239,7 +239,7 @@ experiment.push(
     initial_eval,
     compare_instructions,
     compare_models_timeline,
-    //summary
+    summary
 )
 
 jsPsych.run(experiment)
