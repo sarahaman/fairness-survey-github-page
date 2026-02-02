@@ -4,11 +4,11 @@ const NUM_PERSONS = 6;
 // Possible ESI scores and a translation of their relative 
 // urgency into plain text
 const ESI_URGENCY_DICTIONARY = {
-    "1": "Highest urgency",
-    "2": "High urgency",
-    "3": "Medium urgency",
-    "4": "Low urgency",
-    "5": "Lowest urgency"
+    "1": "Highest Urgency (1)",
+    "2": "Moderate-High Urgency (2)",
+    "3": "Moderate Urgency (3)",
+    "4": "Moderate-Low Urgency (4)",
+    "5": "Low Urgency (5)"
 }
 
 // ESI scores of 3 and greater are considered urgent
@@ -17,13 +17,9 @@ const ESI_URGENCY_THRESHOLD = 3;
 // A consistent fairness scale used when rating how fair a
 // particular model is
 const FAIRNESS_SCALE = {
-    "1" : "Extremely unfair",
-    "2" : "",
-    "3" : "",
-    "4" : "Neither fair nor unfair",
-    "5" : "",
-    "6" : "",
-    "7" : "Extremely fair"
+    "1" : "Not fair",
+    "2" : "Somewhat fair",
+    "3" : "Fair"
 }
 
 // Definitions of each fairness metric

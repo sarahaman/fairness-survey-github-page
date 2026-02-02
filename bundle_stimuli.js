@@ -13,7 +13,9 @@ const orderedFiles = [
     'comprehension.js',
     'definition_evaluation.js',
     'comparison_instructions.js',
-    'compare_models.js'
+    'compare_models.js',
+    'summary.js',
+    'reconciliation.js'
 ];
 
 // Map to full paths

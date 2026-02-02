@@ -5,11 +5,11 @@ const NUM_PERSONS = 6;
 // Possible ESI scores and a translation of their relative 
 // urgency into plain text
 const ESI_URGENCY_DICTIONARY = {
-    "1": "Highest urgency",
-    "2": "High urgency",
-    "3": "Medium urgency",
-    "4": "Low urgency",
-    "5": "Lowest urgency"
+    "1": "Highest Urgency (1)",
+    "2": "Moderate-High Urgency (2)",
+    "3": "Moderate Urgency (3)",
+    "4": "Moderate-Low Urgency (4)",
+    "5": "Low Urgency (5)"
 }
 
 // ESI scores of 3 and greater are considered urgent
@@ -18,13 +18,9 @@ const ESI_URGENCY_THRESHOLD = 3;
 // A consistent fairness scale used when rating how fair a
 // particular model is
 const FAIRNESS_SCALE = {
-    "1" : "Extremely unfair",
-    "2" : "",
-    "3" : "",
-    "4" : "Neither fair nor unfair",
-    "5" : "",
-    "6" : "",
-    "7" : "Extremely fair"
+    "1" : "Not fair",
+    "2" : "Somewhat fair",
+    "3" : "Fair"
 }
 
 // Definitions of each fairness metric
@@ -52,6 +48,10 @@ const MODEL_SHORTHAND = {
 
 function swap(obj) { 
     return Object.fromEntries(Object.entries(obj).map(a => a.reverse()))
+}
+
+function reverse_lookup(object, value) {
+    return Object.keys(object).find(key => object[key] === value);
 }
 
 function format_into_underscores(str){
@@ -136,15 +136,15 @@ function create_mtable(measure, scale_dict, variable_dict){
 // ---------- INTRODUCTION PAGE ---------- //
 
 const introduction_page_text = `
-    Thank you for agreeing to participate in this study. The study will have two parts: <br> <br> 
+    Thank you for agreeing to participate in this study. The study will have two sections: <br> <br> 
         
-    In the first part, you will walk through an example situation about trying to be fair to men 
+    In the first section, you will walk through an example situation about trying to be fair to men 
     and women when admitting patients to an ER at a hospital. You will learn that there are multiple 
     ways to define being "fair" and that those definitions can conflict with each other. After the
     example, there will be some questions assessing your understanding of the defintions of fairness 
     (these will not affect your payment in any way).<br><br>
 
-    In the second part, you will see the differnt fairness definitions in action on a real world data and 
+    In the second section, you will see the differnt fairness definitions in action on a real world data and 
     have a chance to evaluate how they perform.<br><br>
 
     When you are ready, click "Next" to begin part one. <br><br>
@@ -196,36 +196,36 @@ const SELECTION_PATTERNS = {
 const EXPLANATION_PAGE_CONFIG = {
     page_1: {
         page_text : `Suppose we have 40 people waiting in an emergency room, and we can only see 20 of them within the hour. 
-                     <br> <br> Some people have urgent conditions and need to be seen immediately, while others can wait 
+                     <br><br> Some people have urgent conditions and need to be seen immediately, while others can wait 
                      until later. We'll highlight the people who need to be seen immediately in a darker gray.`,
         selection_order: SELECTION_PATTERNS.DEFAULT
     },
 
     page_2: {
-        page_text : `We would like to see the people who need to be seen, and wait to see the people who can wait. 
-                     However, we are likely to make some mistakes in our decision process, so we might end up 
+        page_text : `We would like to see the people who need to be seen immediately, and wait to see the people who 
+                     can wait. However, we are likely to make some mistakes in our decision process, so we might end up 
                      seeing a set of people like this.`, 
         selection_order: SELECTION_PATTERNS.CONTROL
     },
 
     page_3: {
         page_text : `Now suppose that our population of patients is made up of half women (purple) and half men 
-                     (green).<br> <br>Again, among both women and men, some patients need to be seen today (darker 
+                     (green).<br><br>Again, among both women and men, some patients need to be seen today (darker 
                      colors) while others do not (lighter colors). Let's examine our original selection with gender 
                      shown.`,
         selection_order: SELECTION_PATTERNS.DEFAULT
     }, 
 
     page_4: {
-        page_text : `Now that we are paying attention to gender, we are arguably being unfair to the men. Despite 
-                     making up half of the population, men are only 8 / 20 = 40% of the selected patients. In other 
-                     words, patients have a lower chance of being selected simply by being men. <br> This is arguably 
-                     a problem if we want to be fair. How might we fix this?`,
+        page_text : `Now that we are considering gender, we are arguably being unfair to men. Despite 
+                     making up half of the population, men are only 8 / 20 = 40% of the selected patients.
+                     <br><br> This is a problem if we want to be fair to both men and women. How might we 
+                     fix this?`,
         selection_order: SELECTION_PATTERNS.CONTROL
     },
 
     page_5: {
-        page_text : `One solution, called <b>Demographic Parity</b>, is to make sure that we select a pool of patients 
+        page_text : `One solution, called <b>Gender Parity</b>, is to make sure that we select a pool of patients 
                      that is representative of the whole population. So, since our patient population is split evenly 
                      between women and men, we will make sure to select 10 women and 10 men. In this scenario, we might 
                      get a selection like this. <br> <br> Now, women and men have an equal chance of being selected.`,
@@ -252,9 +252,9 @@ const EXPLANATION_PAGE_CONFIG = {
 
     page_8: {
         page_text : `However, we now no longer have <b>Demographic Parity</b>. <br> <br> Despite making up half of the population, men make up 
-             only 9 / 20 = 45% of the selected patients. In fact, it is impossible to satisfy both of the solutions we have considered here.
-             <br> <br> Next, we will ask you some questions about these fairness definitions. Note that your answers to these will 
-             not affect your payment in any way.`,
+             only 9 / 20 = 45% of the selected patients. In fact, it is impossible to satisfy both of the solutions we have considered here
+             at the same time.<br><br> Next, we will ask you some questions about these fairness definitions. Note that your answers to these
+             will not affect your payment in any way.`,
         selection_order: SELECTION_PATTERNS.EQUALIZED_ODDS
     }
 };
@@ -395,8 +395,37 @@ function create_explanation_pages(page, config){
     `;
 }
 
+const explanation_summary_text = `Here are the two being compared again side-by-side.`;
+
+const explanaion_summary_html = `
+<div class="display-container">
+  <div class="column-container">
+  
+    <!-- Demographic Parity Column -->
+    <div class="column">
+      <h3 class="column-title">Demographic Parity</h3>
+      ${generate_squares([GENDER_GROUP.WOMEN, GENDER_GROUP.MEN], 
+                          SELECTION_PATTERNS.DEMOGRAPHIC_PARITY)}
+    </div>
+
+    <!-- Equalized Odds Column -->
+    <div class="column">
+      <h3 class="column-title">Equalized Odds</h3>
+      ${generate_squares([GENDER_GROUP.WOMEN, GENDER_GROUP.MEN], 
+                          SELECTION_PATTERNS.EQUALIZED_ODDS)}
+    </div>
+  </div>
+</div>
+
+  <p class="instructions-paragraph" style="text-align: left;">
+    ${explanation_summary_text}
+  </p>
+`;
+
 const explanation_pages = Object.entries(EXPLANATION_PAGE_CONFIG)
     .map(([page, config]) => create_explanation_pages(page, config));
+
+explanation_pages.push(explanaion_summary_html);
 
 
 
@@ -404,49 +433,35 @@ const explanation_pages = Object.entries(EXPLANATION_PAGE_CONFIG)
 // COMPREHENSION QUESTIONS
 
 const QUESTION_ONE = {
-    question : `To what extent do you agree with the following statement: a scenario similar to 
-                the one described beforehand - where a hospital has implemented an algorithm to
-                determine whether patients are seen - might occur in real life`,
-    options: {
-        'A' : 'Strongly Agree',
-        'B' : 'Somewhat Agree',
-        'C' : 'Neither Agree nor Disagree',
-        'D' : 'Somewhat Disagree',
-        'E' : 'Strongly Disagree'
-    }
-}
-
-const QUESTION_TWO = {
     question: `Suppose a different hospital has an ER waiting room containing:<br>
                <br>4 men that need to be seen today
                <br>6 men that do not need to be seen today
                <br>10 women that need to be seen today
-               <br>10 women that do not need to be seen today<br>`,
+               <br>10 women that do not need to be seen today`,
     subquestions : {
-        'two_1' : {
-            question: `Under the rule of demographic parity, if 2 men are seen today how many 
-                       women would be seen?`,
+        'one_1' : {
+            question: `<br>Under the rule of demographic parity, if 2 men are seen today how many 
+                       women would be seen?<br>`,
             options: {'A': '2', 'B': '4', 'C':'5'}
         },
-        'two_2' : {
-            question: ` Under the rule of equalized odds, if 2 men who need to be seen today are 
-                        seen, how many women that need to be seen today would be seen?`,
+        'one_2' : {
+            question: `<br>Under the rule of equalized odds, if 2 men who need to be seen today are 
+                        seen, how many women that need to be seen today would be seen?<br>`,
             options: {'A': '2', 'B': '4', 'C':'5'}
         },
-        'two_3' : {
-            question: ` Under the rule of equalized odds, if 5 women who do not need to be 
-                        seen today are seen, how many men that do not need to be seen today 
-                        should be seen?`,
+        'one_3' : {
+            question: `<br>Under the rule of equalized odds, if 2 men who need to be seen today are 
+                        seen, how many women that need to be seen today would be seen?<br>`,
             options: {'A': '3', 'B': '5', 'C':'6'}
         }
     }
 }
 
-const QUESTION_THREE = {
+const QUESTION_TWO = {
     question: `Under the rule of demographic parity, in which of these cases can more  
                men be seen today than women?`,
     options: {
-        'A': 'When the men on average have higher urgency indexes than women.',
+        'A': 'When, on average, the men need to be seen more urgently than the women.',
         'B': 'When there are more men in the waiting room than women.',
         'C': 'When the men are on average older than the women.',
         'D': 'This cannot happen under demographic parity.'
@@ -459,102 +474,108 @@ const TRUE_FALSE_OPTIONS = {'True' : '',
 const DP_EO_OPTIONS = {'Demographic Parity': 'Demographic Parity',
                        'Equalized Odds': 'Equalized Odds'}
 
-const QUESTION_FOUR = {
+const QUESTION_THREE = {
     question: `For the next three questions, you will be asked to answer whether a statement is TRUE or FALSE under each of the two rules:<br>`,
-    text : {'four_1' :  `The number of men who are seen must be equal to the number of women who are seen.`,
-            'four_2' :  `Even if a man and a woman are presenting with identical symptoms, they can be treated differently.`,
-            'four_3' :  `The proportion of men who are seen must be equal to the proportion of women who are seen.`},
+    text : {'three_1' :  `The number of men who are seen is always equal to the number of women who are seen.`,
+            'three_2' :  `Even if a man and a woman are presenting with identical symptoms, they can be treated differently.`,
+            'three_3' :  `The proportion of men who are seen is always equal to the proportion of women who are seen.`},
     }
 
+const QUESTION_FOUR = {
+    question : `To what extent do you agree with the following statement: a scenario similar to 
+                the one described beforehand - where a hospital has implemented an algorithm to
+                determine whether patients are seen - might occur in real life.<br>`,
+    options: {
+        'A' : 'Strongly Agree',
+        'B' : 'Somewhat Agree',
+        'C' : 'Neither Agree nor Disagree',
+        'D' : 'Somewhat Disagree',
+        'E' : 'Strongly Disagree'
+    }
+}
 // Create a radio button set for each question
-var question_one_radio = create_radio_options("q1", QUESTION_ONE.options);
-var question_two_1_radio = create_radio_options("q2_1", QUESTION_TWO.subquestions.two_1.options);
-var question_two_2_radio = create_radio_options("q2_2", QUESTION_TWO.subquestions.two_2.options);
-var question_two_3_radio = create_radio_options("q2_3", QUESTION_TWO.subquestions.two_3.options);
-var question_three_radio = create_radio_options("q3", QUESTION_THREE.options);
-var question_four_1_table = create_mtable("q4_1", TRUE_FALSE_OPTIONS, DP_EO_OPTIONS);
-var question_four_2_table = create_mtable("q4_2", TRUE_FALSE_OPTIONS, DP_EO_OPTIONS);
-var question_four_3_table = create_mtable("q4_3", TRUE_FALSE_OPTIONS, DP_EO_OPTIONS);
+var question_one_1_radio = create_radio_options("q1_1", QUESTION_ONE.subquestions.one_1.options);
+var question_one_2_radio = create_radio_options("q1_2", QUESTION_ONE.subquestions.one_2.options);
+var question_one_3_radio = create_radio_options("q1_3", QUESTION_ONE.subquestions.one_3.options);
+var question_two_radio = create_radio_options("q2", QUESTION_TWO.options);
+var question_three_1_table = create_mtable("q3_1", TRUE_FALSE_OPTIONS, DP_EO_OPTIONS);
+var question_three_2_table = create_mtable("q3_2", TRUE_FALSE_OPTIONS, DP_EO_OPTIONS);
+var question_three_3_table = create_mtable("q3_3", TRUE_FALSE_OPTIONS, DP_EO_OPTIONS);
+var question_four_radio = create_radio_options("q4", QUESTION_FOUR.options);
+
 
 // Create the pages 
+function createComprehensionPage(question, subquestion = null, responseElement = '') {
+    return `
+        <div class="prevent-select" style="text-align: left; width: 900px;">
 
-const COMPREHENSION_PAGE_1 = 
-    `<div class="prevent-select" style="text-align: left; width: 900px;">
         Please answer the following questions. As a reminder, here are the fairness definitions:<br><br>
-        <b>Demographic Parity</b>: ${DEFINITIONS['Demographic Parity']}
-        <br><br>
-        <b> Equalized Odds</b>: ${DEFINITIONS['Equalized Odds']}
-        <br><br>
-        ${QUESTION_ONE.question}
-        <br><br>
-        ${question_one_radio}
-    </div>
-    <br>
-    <br>`
 
-const COMPREHENSION_PAGE_2 =
-    `<div class="prevent-select" style="text-align: left; width: 900px;">
-        Please answer the following questions. As a reminder, here are the fairness definitions:<br><br>
-        <b>Demographic Parity</b>: ${DEFINITIONS['Demographic Parity']}
-        <br><br>
-        <b> Equalized Odds</b>: ${DEFINITIONS['Equalized Odds']}
-        <br><br>
-        ${QUESTION_TWO.question}
-        <br>
-        ${QUESTION_TWO.subquestions.two_1.question}
-        <br>
-        ${question_two_1_radio}
-        <br>
-        ${QUESTION_TWO.subquestions.two_2.question}
-        <br>
-        ${question_two_2_radio}
-        <br>
-        ${QUESTION_TWO.subquestions.two_3.question}
-        <br>
-        ${question_two_3_radio}
-    </div>
-    <br>
-    <br>`
+        <b>Demographic Parity</b>: ${DEFINITIONS['Demographic Parity']}<br><br>
+        <b>Equalized Odds</b>: ${DEFINITIONS['Equalized Odds']}<br><br>
 
-const COMPREHENSION_PAGE_3 =
-    `<div class="prevent-select" style="text-align: left; width: 900px;">
-        Please answer the following questions. As a reminder, here are the fairness definitions:<br><br>
-        <b>Demographic Parity</b>: ${DEFINITIONS['Demographic Parity']}
-        <br><br>
-        <b> Equalized Odds</b>: ${DEFINITIONS['Equalized Odds']}
-        <br><br>
-        ${QUESTION_THREE.question}
+        ${question}
+        ${subquestion ? `<br>${subquestion}` : ''}
         <br>
-        ${question_three_radio}
-    </div>
-    <br>
-    <br>`
+        ${responseElement}
+        </div>
+        <br><br>
+    `;
+}
 
-const COMPREHENSION_PAGE_4 =
-    `<div class="prevent-select" style="text-align: left; width: 900px;">
-        Please answer the following questions. As a reminder, here are the fairness definitions:<br><br>
-        <b>Demographic Parity</b>: ${DEFINITIONS['Demographic Parity']}
-        <br><br>
-        <b> Equalized Odds</b>: ${DEFINITIONS['Equalized Odds']}
-        <br><br>
-        ${QUESTION_FOUR.question}
-        <br>
-        ${QUESTION_FOUR.text.four_1}
-        <br>
-        ${question_four_1_table}
-        <br>
-        ${QUESTION_FOUR.text.four_2}
-        <br>
-        ${question_four_2_table}
-        <br>
-        ${QUESTION_FOUR.text.four_3}
-        <br>
-        ${question_four_3_table}
-    </div>
-    <br>
-    <br>`
+// Declare the comprehension pages
+const COMPREHENSION_PAGE_1_1 = createComprehensionPage(
+    QUESTION_ONE.question,
+    QUESTION_ONE.subquestions.one_1.question,
+    question_one_1_radio
+);
 
-    //var comprehension_pages = [PAGE_1, PAGE_2, PAGE_3, PAGE_4]
+const COMPREHENSION_PAGE_1_2 = createComprehensionPage(
+    QUESTION_ONE.question,
+    QUESTION_ONE.subquestions.one_2.question,
+    question_one_2_radio
+);
+
+const COMPREHENSION_PAGE_1_3 = createComprehensionPage(
+    QUESTION_ONE.question,
+    QUESTION_ONE.subquestions.one_3.question,
+    question_one_3_radio
+);
+
+const COMPREHENSION_PAGE_2 = createComprehensionPage(
+    QUESTION_TWO.question,
+    null,
+    question_two_radio
+);
+
+const COMPREHENSION_PAGE_3_1 = createComprehensionPage(
+    QUESTION_THREE.question,
+    QUESTION_THREE.text.three_1,
+    question_three_1_table
+);
+
+const COMPREHENSION_PAGE_3_2 = createComprehensionPage(
+    QUESTION_THREE.question,
+    QUESTION_THREE.text.three_2,
+    question_three_2_table
+);
+
+const COMPREHENSION_PAGE_3_3 = createComprehensionPage(
+    QUESTION_THREE.question,
+    QUESTION_THREE.text.three_3,
+    question_three_3_table
+);
+
+const COMPREHENSION_PAGE_4 = createComprehensionPage(
+    QUESTION_FOUR.question,
+    null,
+    question_four_radio
+);
+
+var comprehension_pages = [COMPREHENSION_PAGE_1_1, COMPREHENSION_PAGE_1_2, COMPREHENSION_PAGE_1_3,
+                            COMPREHENSION_PAGE_2,
+                            COMPREHENSION_PAGE_3_1, COMPREHENSION_PAGE_3_2, COMPREHENSION_PAGE_3_3,
+                            COMPREHENSION_PAGE_4];
 
 // ---- definition_evaluation.js ----
 
@@ -604,18 +625,20 @@ const INSTRUCTIONS_FOR_COMPARISONS_PAGE_TEXT = {
              the button below to begin. `
 }
 
-function create_example_patient(person_id, gender, age, complaint, esi){
+function create_example_patient(person_id, gender, age, complaint, esi, admit=""){
     let esi_text = ESI_URGENCY_DICTIONARY[esi]
     let urgency_status = "nonurgent"; // Always non-urgent
 
     const example_patient_html = `
-        <div class="profile ${person_id} ${gender} ${urgency_status}" id=${person_id}">
+        <div class="profile ${person_id} ${gender} ${urgency_status} ${admit}" id=${person_id}">
             <div class="profile-col profile-text">
                 <div>
-                    <b>Age:</b> ${age}<br>
-                    <b>Gender:</b> ${gender}<br>
-                    <b>Complaint:</b> ${complaint}<br>
-                    <b>Urgency: </b>${esi_text}
+                    <b>Age:</b> ${age} 
+                    <br>
+                    <b>Complaint:</b> ${complaint}
+                    <br>
+                    <b>Urgency:</b>
+                    ${esi_text}
                 </div>
             </div>
         </div>
@@ -627,7 +650,11 @@ const EXAMPLE_PATIENTS = {
     "PATIENT 1": create_example_patient("1", "Woman", "62", "Fatigue", "1"),
     "PATIENT 2": create_example_patient("2", "Woman", "29", "Nausea", "4"),
     "PATIENT 3": create_example_patient("3", "Man", "45", "Arm Injury", "2"),
-    "PATIENT 4": create_example_patient("4", "Man", "34", "Leg Pain", "5")
+    "PATIENT 4": create_example_patient("4", "Man", "34", "Leg Pain", "5"),
+    "PATIENT 5": create_example_patient("5", "Man", "28", "Nausea", "4"),
+    "PATIENT 6": create_example_patient("6", "Man", "64", "Sore Throat", "5"),
+    "PATIENT 1 ADMIT": create_example_patient("1", "Woman", "62", "Fatigue", "1", "admit"),
+    "PATIENT 3 ADMIT": create_example_patient("3", "Man", "45", "Arm Injury", "2", "admit")
 }
 
 // Create the comparison instructions pages
@@ -648,6 +675,8 @@ const compare_instructions_page2 = `
         ${EXAMPLE_PATIENTS["PATIENT 2"]}
         ${EXAMPLE_PATIENTS["PATIENT 3"]}
         ${EXAMPLE_PATIENTS["PATIENT 4"]}
+        ${EXAMPLE_PATIENTS["PATIENT 5"]}
+        ${EXAMPLE_PATIENTS["PATIENT 6"]}
         </div>
     </div>
     <br><br>
@@ -660,10 +689,12 @@ const compare_instructions_page2 = `
 const compare_instructions_page3 = `
     <div class="compare-instructions-display">
         <div class="profiles-container" style="width: 50%; margin: auto;">
-        ${EXAMPLE_PATIENTS["PATIENT 1"]}
+        ${EXAMPLE_PATIENTS["PATIENT 1 ADMIT"]}
         ${EXAMPLE_PATIENTS["PATIENT 2"]}
-        ${EXAMPLE_PATIENTS["PATIENT 3"]}
+        ${EXAMPLE_PATIENTS["PATIENT 3 ADMIT"]}
         ${EXAMPLE_PATIENTS["PATIENT 4"]}
+        ${EXAMPLE_PATIENTS["PATIENT 5"]}
+        ${EXAMPLE_PATIENTS["PATIENT 6"]}
         </div>
     </div>
     <br><br>
@@ -734,17 +765,19 @@ function create_person(persons, model, n){
     let person_id = `person-${n}`;
     let esi = parseInt(persons[n]["esi"]);
     let esi_text = ESI_URGENCY_DICTIONARY[esi]
-    let gender = persons[n]["gender"];
     const urgency_status = "nonurgent";
 
     let person_html = `
-            <div class="profile ${persons[n]["decisions"][model]} ${gender} ${urgency_status}" id=${person_id}>
+            <div class="profile ${persons[n]["decisions"][model]} ${persons[n]["gender"]} ${urgency_status}" id=${person_id}>
                 <div class="profile-col profile-text">
                     <div>
-                        <b>Age:</b> ${persons[n]["age"]}<br>
-                        <b>Gender:</b> ${gender}<br>
-                        <b>Complaint:</b> ${persons[n]["complaint"]}<br>
-                        <b>Urgency:</b> ${esi_text}
+                        <b>Age:</b> ${persons[n]["age"]} 
+                        <br>
+                        <b>Complaint:</b> 
+                        ${persons[n]["complaint"]}
+                        <br>
+                        <b>Urgency:</b>
+                        ${esi_text}
                     </div>
                 </div>
             </div>
@@ -833,5 +866,152 @@ function compare_models_check_finish() {
 
     jsPsych.finishTrial()
 }
+
+
+// ---- summary.js ----
+// Initial fairest response
+
+function get_model_name(shorthand, MODEL_SHORTHAND) {
+    const shorthand_swap_dict = swap(MODEL_SHORTHAND);
+    return shorthand_swap_dict[shorthand] || "an unknown model";
+}
+
+function get_frequency_text(fairest_counts) { 
+    let num_trials = 0; 
+    let frequency_text = '<ul>';
+    
+    Object.entries(fairest_counts).forEach(([choice, count]) => { 
+        num_trials += count; 
+        var model_name = get_model_name(choice, MODEL_SHORTHAND);
+        frequency_text += `<li>${model_name}: ${count} selections</li>`; 
+    });
+
+    frequency_text += '</ul>'; 
+    return { frequency_text, num_trials }; 
+}
+
+function get_consistency_text(fairest_counts, init_fairest_response, num_trials) { 
+    const consistent = fairest_counts[init_fairest_response] === num_trials;
+    const consistency_text = consistent ? 'Your selections were fully consistent with your stated fairness definition.' : `
+            Your selections were not fully consistent with your stated fairness definition. This is unsuprising; it can be
+            difficult to apply abstract definitions of fairness to specific cases. Furthermore, real-world decisions
+            often involve trade-offs between values that complicate purely mathematical definitions of fairness.<br><br> 
+
+            In the final part of the study, you will have the opportunity to either reconcile your choices with your
+            stated fairness preference or choose to keep your choices as they are. We will ask you to reflect on the reasons
+            for your decisions.
+            ` 
+    return consistency_text;
+}
+
+
+function buildSummaryTrial(init_fairest_response, fairest_counts, MODEL_SHORTHAND) { 
+    const selected_model_name = get_model_name(init_fairest_response, MODEL_SHORTHAND);
+    const { frequency_text, num_trials } = get_frequency_text(fairest_counts);
+    const text = init_fairest_response ? get_consistency_text(fairest_counts, init_fairest_response, num_trials) : "We couldn't determine your initial choice. Please go back and complete the earlier section.";
+    
+    const summary_html = `
+        <div class="prevent-select" style="text-align: left; width: 900px;"> 
+            <h2>Your Selection Summary</h2> 
+            You originally selected the ${selected_model_name} model as the most fair, based on its definition.
+            <br><br>.
+            The following summarizes how many times you selected each model as fairest across the different cases:
+            <br>
+            ${frequency_text}
+            <br>
+            ${text}<br>
+        </div>
+        `;
+    
+    return summary_html;
+};
+
+// --- End --- //
+
+// ---- reconciliation.js ----
+
+function get_disagreements(init_fairest_response, trials) {
+    let disagreements = [];
+    trials.forEach(trial => {
+        const is_consistent = trial['fairest'] === init_fairest_response;
+        if (!is_consistent) {
+            disagreements.push(trial);
+        }
+    });
+    return disagreements
+}
+
+function get_models_to_show(init_fairest_response, disagreements) {
+    const models_to_show = new Set();
+    models_to_show.add(init_fairest_response);
+    disagreements.forEach(trial => {
+        models_to_show.add(trial['fairest']);
+    });
+    return Array.from(models_to_show);
+}
+
+function create_reconcilliation_container(persons, models_to_show) {
+    // Create reconcilliation container for a single trial 
+
+    let initial_choice = models_to_show[0];
+    let selected_fairest = models_to_show[1];
+
+    let reconcilliation_container_html = `
+    <div class="models-container">
+        <div class="profiles-label">${initial_choice}</div>
+        <div class="profiles-label">${selected_fairest}</div>
+        <div class="profiles-label">Model C</div>
+        
+        ${profile_column(persons, initial_choice)}
+        ${profile_column(persons, selected_fairest)}
+        </div>`;
+
+    return reconcilliation_container_html;
+}
+
+function compare_reconciliation_stimulus(init_fairest_response, acted_on, persons) {
+
+    let name_init_response = reverse_lookup(MODEL_SHORTHAND, init_fairest_response);
+    let name_acted_on = reverse_lookup(MODEL_SHORTHAND, acted_on);
+
+    let responses = {
+        "Initial Farest Response" : name_init_response,
+        "Acted On Model" : name_acted_on
+    }
+
+    let choice_radio_html = create_radio_options("rec_choice", responses);
+
+    let string = `
+        <div class="stimulus-wrapper">
+            <div class="models-container">
+                <div class="profiles-label">${name_init_response}</div>
+                <div class="profiles-label">${name_acted_on}</div>
+                ${profile_column(persons, init_fairest_response)}
+                ${profile_column(persons, acted_on)}
+            </div>
+            <br>
+            <br>
+            <div class="questions-container">
+                <div class="prevent-select" style="text-align: left;">
+                    What model do you think is the most fair?
+                    <br><br>
+                    ${choice_radio_html}
+                    <br><br>
+                    Please write a 1 - 2 sent4ence explanation for your choice:
+                    <br><br>
+                    <textarea id="rec_explanation" name="rec_explanation" rows="4" cols="50" placeholder="Type your explanation here..."></textarea>
+                </div>
+            </div>
+            <br>
+        </div>
+        <button class="model-compare-button">Done</button>
+        <br><br>
+        </div>
+    `
+
+    return string
+}
+
+
 
 

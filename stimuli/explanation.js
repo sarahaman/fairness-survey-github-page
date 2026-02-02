@@ -32,36 +32,36 @@ const SELECTION_PATTERNS = {
 const EXPLANATION_PAGE_CONFIG = {
     page_1: {
         page_text : `Suppose we have 40 people waiting in an emergency room, and we can only see 20 of them within the hour. 
-                     <br> <br> Some people have urgent conditions and need to be seen immediately, while others can wait 
+                     <br><br> Some people have urgent conditions and need to be seen immediately, while others can wait 
                      until later. We'll highlight the people who need to be seen immediately in a darker gray.`,
         selection_order: SELECTION_PATTERNS.DEFAULT
     },
 
     page_2: {
-        page_text : `We would like to see the people who need to be seen, and wait to see the people who can wait. 
-                     However, we are likely to make some mistakes in our decision process, so we might end up 
+        page_text : `We would like to see the people who need to be seen immediately, and wait to see the people who 
+                     can wait. However, we are likely to make some mistakes in our decision process, so we might end up 
                      seeing a set of people like this.`, 
         selection_order: SELECTION_PATTERNS.CONTROL
     },
 
     page_3: {
         page_text : `Now suppose that our population of patients is made up of half women (purple) and half men 
-                     (green).<br> <br>Again, among both women and men, some patients need to be seen today (darker 
+                     (green).<br><br>Again, among both women and men, some patients need to be seen today (darker 
                      colors) while others do not (lighter colors). Let's examine our original selection with gender 
                      shown.`,
         selection_order: SELECTION_PATTERNS.DEFAULT
     }, 
 
     page_4: {
-        page_text : `Now that we are paying attention to gender, we are arguably being unfair to the men. Despite 
-                     making up half of the population, men are only 8 / 20 = 40% of the selected patients. In other 
-                     words, patients have a lower chance of being selected simply by being men. <br> This is arguably 
-                     a problem if we want to be fair. How might we fix this?`,
+        page_text : `Now that we are considering gender, we are arguably being unfair to men. Despite 
+                     making up half of the population, men are only 8 / 20 = 40% of the selected patients.
+                     <br><br> This is a problem if we want to be fair to both men and women. How might we 
+                     fix this?`,
         selection_order: SELECTION_PATTERNS.CONTROL
     },
 
     page_5: {
-        page_text : `One solution, called <b>Demographic Parity</b>, is to make sure that we select a pool of patients 
+        page_text : `One solution, called <b>Gender Parity</b>, is to make sure that we select a pool of patients 
                      that is representative of the whole population. So, since our patient population is split evenly 
                      between women and men, we will make sure to select 10 women and 10 men. In this scenario, we might 
                      get a selection like this. <br> <br> Now, women and men have an equal chance of being selected.`,
@@ -88,9 +88,9 @@ const EXPLANATION_PAGE_CONFIG = {
 
     page_8: {
         page_text : `However, we now no longer have <b>Demographic Parity</b>. <br> <br> Despite making up half of the population, men make up 
-             only 9 / 20 = 45% of the selected patients. In fact, it is impossible to satisfy both of the solutions we have considered here.
-             <br> <br> Next, we will ask you some questions about these fairness definitions. Note that your answers to these will 
-             not affect your payment in any way.`,
+             only 9 / 20 = 45% of the selected patients. In fact, it is impossible to satisfy both of the solutions we have considered here
+             at the same time.<br><br> Next, we will ask you some questions about these fairness definitions. Note that your answers to these
+             will not affect your payment in any way.`,
         selection_order: SELECTION_PATTERNS.EQUALIZED_ODDS
     }
 };
@@ -231,6 +231,35 @@ function create_explanation_pages(page, config){
     `;
 }
 
+const explanation_summary_text = `Here are the two being compared again side-by-side.`;
+
+const explanaion_summary_html = `
+<div class="display-container">
+  <div class="column-container">
+  
+    <!-- Demographic Parity Column -->
+    <div class="column">
+      <h3 class="column-title">Demographic Parity</h3>
+      ${generate_squares([GENDER_GROUP.WOMEN, GENDER_GROUP.MEN], 
+                          SELECTION_PATTERNS.DEMOGRAPHIC_PARITY)}
+    </div>
+
+    <!-- Equalized Odds Column -->
+    <div class="column">
+      <h3 class="column-title">Equalized Odds</h3>
+      ${generate_squares([GENDER_GROUP.WOMEN, GENDER_GROUP.MEN], 
+                          SELECTION_PATTERNS.EQUALIZED_ODDS)}
+    </div>
+  </div>
+</div>
+
+  <p class="instructions-paragraph" style="text-align: left;">
+    ${explanation_summary_text}
+  </p>
+`;
+
 const explanation_pages = Object.entries(EXPLANATION_PAGE_CONFIG)
     .map(([page, config]) => create_explanation_pages(page, config));
+
+explanation_pages.push(explanaion_summary_html);
 

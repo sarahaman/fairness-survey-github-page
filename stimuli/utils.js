@@ -4,6 +4,10 @@ function swap(obj) {
     return Object.fromEntries(Object.entries(obj).map(a => a.reverse()))
 }
 
+function reverse_lookup(object, value) {
+    return Object.keys(object).find(key => object[key] === value);
+}
+
 function format_into_underscores(str){
     return str.toLowerCase().replace(/\s+/g, '_');
 }

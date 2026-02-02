@@ -20,18 +20,20 @@ const INSTRUCTIONS_FOR_COMPARISONS_PAGE_TEXT = {
              the button below to begin. `
 }
 
-function create_example_patient(person_id, gender, age, complaint, esi){
+function create_example_patient(person_id, gender, age, complaint, esi, admit=""){
     let esi_text = ESI_URGENCY_DICTIONARY[esi]
     let urgency_status = "nonurgent"; // Always non-urgent
 
     const example_patient_html = `
-        <div class="profile ${person_id} ${gender} ${urgency_status}" id=${person_id}">
+        <div class="profile ${person_id} ${gender} ${urgency_status} ${admit}" id=${person_id}">
             <div class="profile-col profile-text">
                 <div>
-                    <b>Age:</b> ${age}<br>
-                    <b>Gender:</b> ${gender}<br>
-                    <b>Complaint:</b> ${complaint}<br>
-                    <b>Urgency: </b>${esi_text}
+                    <b>Age:</b> ${age} 
+                    <br>
+                    <b>Complaint:</b> ${complaint}
+                    <br>
+                    <b>Urgency:</b>
+                    ${esi_text}
                 </div>
             </div>
         </div>
@@ -43,7 +45,11 @@ const EXAMPLE_PATIENTS = {
     "PATIENT 1": create_example_patient("1", "Woman", "62", "Fatigue", "1"),
     "PATIENT 2": create_example_patient("2", "Woman", "29", "Nausea", "4"),
     "PATIENT 3": create_example_patient("3", "Man", "45", "Arm Injury", "2"),
-    "PATIENT 4": create_example_patient("4", "Man", "34", "Leg Pain", "5")
+    "PATIENT 4": create_example_patient("4", "Man", "34", "Leg Pain", "5"),
+    "PATIENT 5": create_example_patient("5", "Man", "28", "Nausea", "4"),
+    "PATIENT 6": create_example_patient("6", "Man", "64", "Sore Throat", "5"),
+    "PATIENT 1 ADMIT": create_example_patient("1", "Woman", "62", "Fatigue", "1", "admit"),
+    "PATIENT 3 ADMIT": create_example_patient("3", "Man", "45", "Arm Injury", "2", "admit")
 }
 
 // Create the comparison instructions pages
@@ -64,6 +70,8 @@ const compare_instructions_page2 = `
         ${EXAMPLE_PATIENTS["PATIENT 2"]}
         ${EXAMPLE_PATIENTS["PATIENT 3"]}
         ${EXAMPLE_PATIENTS["PATIENT 4"]}
+        ${EXAMPLE_PATIENTS["PATIENT 5"]}
+        ${EXAMPLE_PATIENTS["PATIENT 6"]}
         </div>
     </div>
     <br><br>
@@ -76,10 +84,12 @@ const compare_instructions_page2 = `
 const compare_instructions_page3 = `
     <div class="compare-instructions-display">
         <div class="profiles-container" style="width: 50%; margin: auto;">
-        ${EXAMPLE_PATIENTS["PATIENT 1"]}
+        ${EXAMPLE_PATIENTS["PATIENT 1 ADMIT"]}
         ${EXAMPLE_PATIENTS["PATIENT 2"]}
-        ${EXAMPLE_PATIENTS["PATIENT 3"]}
+        ${EXAMPLE_PATIENTS["PATIENT 3 ADMIT"]}
         ${EXAMPLE_PATIENTS["PATIENT 4"]}
+        ${EXAMPLE_PATIENTS["PATIENT 5"]}
+        ${EXAMPLE_PATIENTS["PATIENT 6"]}
         </div>
     </div>
     <br><br>

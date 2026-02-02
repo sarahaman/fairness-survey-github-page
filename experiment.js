@@ -22,11 +22,12 @@ jsPsych.data.addProperties({
     prolific_id: url_pid
 })
 
-var current_persons = null
-var current_fairest = null
-var current_fair_control = null
-var current_fair_dp = null
-var current_fair_eo = null
+var current_persons = null;
+var current_fairest = null;
+var current_fair_control = null;
+var current_fair_dp = null;
+var current_fair_eo = null;
+var current_disagreements = null;
 
 ///// TRIALS /////
 
@@ -105,7 +106,7 @@ const first_instructions = {
     data: {
         type_of_trial: "first_instructions"
     }
-}
+};
 
 const explanation = {
     type: jsPsychInstructions,
@@ -118,51 +119,27 @@ const explanation = {
     data: {
         type_of_trial: "explanation"
     }
-}
+};
 
-const comprehension_one = {
-    type: jsPsychSurveyHtmlForm,
-    html: COMPREHENSION_PAGE_1,
-    on_load: function() {
-        document.getElementById("jspsych-content").style.margin = "50px auto"
-    },
-    data: {
-        type_of_trial: "comprehension"
-    }
-}
+const comprehension_questions = {
+    timeline: [{
+        type: jsPsychHtmlButtonResponse,
+        stimulus: function() {
+            const current_page = jsPsych.timelineVariable('page');
+            return `
+                <div class="prevent-select" style="text-align: left; width: 900px;">
+                    ${current_page}
+                </div>
+                <br><br>
+            `;
+        },
+        choices: ["Next"],
+        trial_duration: null
+    }],
+    timeline_variables: comprehension_pages.map(page => ({ page: page })),
+    randomize_order: false
+};
 
-const comprehension_two = {
-    type: jsPsychSurveyHtmlForm,
-    html: COMPREHENSION_PAGE_2,
-    on_load: function() {
-        document.getElementById("jspsych-content").style.margin = "50px auto"
-    },
-    data: {
-        type_of_trial: "comprehension"
-    }
-}
-
-const comprehension_three = {
-    type: jsPsychSurveyHtmlForm,
-    html: COMPREHENSION_PAGE_3,
-    on_load: function() {
-        document.getElementById("jspsych-content").style.margin = "50px auto"
-    },
-    data: {
-        type_of_trial: "comprehension"
-    }
-}
-
-const comprehension_four = {
-    type: jsPsychSurveyHtmlForm,
-    html: COMPREHENSION_PAGE_4,
-    on_load: function() {
-        document.getElementById("jspsych-content").style.margin = "50px auto"
-    },
-    data: {
-        type_of_trial: "comprehension"
-    }
-}
 const initial_eval = {
     type: jsPsychSurveyHtmlForm,
     html: initial_eval_questions,
@@ -172,7 +149,7 @@ const initial_eval = {
     data: {
         type_of_trial: "initial_eval"
     }
-}
+};
 
 const compare_instructions = {
     type: jsPsychInstructions,
@@ -198,7 +175,7 @@ const compare_instructions = {
     data: {
         type_of_trial: "compare_instructions"
     }
-}
+};
 
 const compare_models = {
     type: jsPsychHtmlKeyboardResponse,
@@ -214,32 +191,128 @@ const compare_models = {
         data.fair_control = current_fair_control
         data.fair_dp = current_fair_dp
         data.fair_eo = current_fair_eo
+        data.persons = current_persons
     },
     data: {
         type_of_trial: "compare_models"
     }
-}
+};
 
 const compare_models_timeline = {
     timeline: [compare_models],
     timeline_variables: conditions,
     randomize_order: false
-}
+};
+
+const summary = {
+    type: jsPsychSurveyHtmlForm, 
+    html: '', 
+    on_start(trial) {
+        const init = jsPsych.data.get()
+            .filter({ type_of_trial: "initial_eval" })
+            .values();
+
+        const init_fairest_response = init[0]?.response?.er_fairest || null;
+
+        const fairest_values = jsPsych.data.get()
+            .filter({ type_of_trial: "compare_models" })
+            .select("fairest")
+
+        console.log(fairest_values);
+
+        const fairest_counts = fairest_values
+            .frequencies();
+
+        trial.html = buildSummaryTrial(init_fairest_response, fairest_counts, MODEL_SHORTHAND);
+    },
+    on_load: () => { 
+        const el = document.getElementById("jspsych-content"); 
+        if (el) el.style.margin = "50px auto"; 
+    },
+    data: { type_of_trial: "summary" }
+ };
+
+ const reconciliation = {
+    type: jsPsychHtmlKeyboardResponse,
+    stimulus: function() {
+        const init = jsPsych.data.get()
+            .filter({ type_of_trial: "initial_eval" })
+            .values();
+
+        let trial_fairest_response = init[0]?.response?.er_fairest || null;    
+
+        acted_on = jsPsych.timelineVariable('selected');
+        persons = jsPsych.timelineVariable('persons');
+
+        console.log(trial_fairest_response, acted_on, persons);
+
+        return compare_reconciliation_stimulus(trial_fairest_response, acted_on, persons);
+    },
+    choices: "NO_KEYS",
+    on_load: function () {
+        current_persons = jsPsych.timelineVariable("persons")
+    },
+    data: {
+        type_of_trial: "compare_models"
+    }
+};
+
+const disagreements = function () {
+    const init = jsPsych.data.get()
+        .filter({ type_of_trial: "initial_eval" })
+        .values();
+
+    const init_fairest_response = init[0]?.response?.er_fairest || null;
+
+    console.log("Initial fairest response:", init_fairest_response);
+
+    const compare_models_trials = jsPsych.data.get()
+        .filter({type_of_trial: "compare_models"})
+        .values();
+
+    console.log("Compare models trials:", compare_models_trials);
+
+    const disagreements = get_disagreements(init_fairest_response, 
+                                         compare_models_trials);
+
+    console.log("Disagreements:", disagreements);
+
+    return disagreements.map((trial) => ({
+        selected: trial.fairest,
+        persons: trial.persons,
+    }));
+
+};
+
+const reconciliation_timeline = {
+  timeline: [reconciliation],
+  timeline_variables: [{ selected: 'Error', persons: {} }], // placeholder
+  on_timeline_start: function () { 
+    const current_disagreements = disagreements();
+    console.log("Current disagreements:", current_disagreements);
+
+    if (Array.isArray(current_disagreements) && current_disagreements.length) {
+      this.timeline_variables = current_disagreements;
+      console.log("Updated timeline_variables:", this.timeline_variables);
+    } else {
+      console.warn("No disagreements found; keeping placeholder timeline_variables.");
+    }
+  },
+  randomize_order: false
+};
 
 var models_viewed = [];
 var experiment = [];
 
 experiment.push(
-    first_instructions,
+    //first_instructions,
     explanation,
-    comprehension_one,
-    comprehension_two,
-    comprehension_three,
-    comprehension_four,
+    //comprehension_questions,
     initial_eval,
-    compare_instructions,
+    //compare_instructions,
     compare_models_timeline,
-    //summary
+    summary,
+    reconciliation_timeline
 )
 
 jsPsych.run(experiment)
