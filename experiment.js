@@ -306,12 +306,12 @@ var experiment = [];
 
 experiment.push(
     //first_instructions,
-    explanation,
+    //explanation,
     //comprehension_questions,
     initial_eval,
     //compare_instructions,
     compare_models_timeline,
-    summary,
+    //summary,
     reconciliation_timeline
 )
 

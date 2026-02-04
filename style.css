@@ -425,6 +425,22 @@
 .column {
   display: flex;
   flex-direction: column;
+  align-items: center;
+}
+
+.reconciliation-column {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+  gap: 10px;
+}
+
+.reconciliation-container {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    width: 100%;
 }
 
 .column-title {

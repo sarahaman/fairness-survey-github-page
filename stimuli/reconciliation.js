@@ -51,22 +51,26 @@ function compare_reconciliation_stimulus(init_fairest_response, acted_on, person
     let choice_radio_html = create_radio_options("rec_choice", responses);
 
     let string = `
-        <div class="stimulus-wrapper">
-            <div class="models-container">
-                <div class="profiles-label">${name_init_response}</div>
-                ${profile_column(persons, init_fairest_response)}
-                <div class="profiles-label">${name_acted_on}</div>
-                ${profile_column(persons, acted_on)}
+            <div class="display-container">
+                <div class="reconciliation-column">
+                    <div class="profiles-label">${name_init_response}</div>
+                    ${profile_column(persons, init_fairest_response)}
+                </div>
+                <div class ="reconciliation-column">
+                    <div class="profiles-label">${name_acted_on}</div>
+                    ${profile_column(persons, acted_on)}
+                </div>
             </div>
-            <br>
-            <br>
+        <br>
+         <br>
+          <div class="stimulus-wrapper">
             <div class="questions-container">
                 <div class="prevent-select" style="text-align: left;">
-                    What selection do you think is the most fair?
+                    Which model do you believe is more fair?
                     <br><br>
                     ${choice_radio_html}
                     <br><br>
-                    Please write a 1 - 2 sent4ence explanation for your choice:
+                    Please write a 1 - 2 sentence explanation for your choice:
                     <br><br>
                     <textarea id="rec_explanation" name="rec_explanation" rows="4" cols="50" placeholder="Type your explanation here..."></textarea>
                 </div>
